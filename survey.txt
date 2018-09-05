@@ -1,0 +1,25 @@
+Steffan Van Hoesen
+
+1)    Why are you taking this course?
+		Because I think computer graphics are interesting.
+		
+2)    What do you think you’ll learn in this course?
+		I think that I will learn about how computers generate images and animations. 
+
+3)    List the three programming languages you are most comfortable with, with how many years of experience you have with each
+		Java[4], C[5], scheme[2] 
+
+4)    What experience do you have with C++? Have you used the STL before?
+		Very little it was used for a project in a class I took at pima. No I have not.
+
+5)    Do you know what operators are in C++ and how to overload them? If so, in what situations have you found these useful?
+		I am know a little, but I have no idea about how to overload them.
+
+6)    What’s the best computer graphics you’ve ever seen? Why do you like it?
+		  I am not too sure but probably something from a video game.
+
+7)    What’s the worst computer graphics you’ve ever seen? Why do you not like it?
+		I am not sure. It must have been so bad that I pushed it out of my memory.
+
+8)    Tell me about something cool you learned recently. If you were meeting with a friend, what would you chat about? Possible answers: books, movies, TV shows, blogs, podcasts, etc. It does not have to be about computer graphics.
+		I learned how to pick a lock from my computer security class. Depending on the friend it could be games, movies/videos, music, or even upcomming events.
