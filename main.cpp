@@ -2,6 +2,7 @@
 /// \file main.cpp
 /// \brief SDL Demo Code
 /// \author Joshua A. Levine <josh@email.arizona.edu>
+/// \co-author Steffan Van Hoesen
 /// \date 01/15/18
 ///
 /// This code provides an introductory demonstration of SDL.  When run, a
@@ -49,10 +50,146 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <exception>
 
 using namespace std;
 
+class ppm {
+	void init();
+	//info about the PPM file (height and width)
+	unsigned int nr_lines;
+	unsigned int nr_columns;
+	
+	public:
+	//arrays for storing the R,G,B values
+	std::vector<unsigned char> r;
+	std::vector<unsigned char> g;
+	std::vector<unsigned char> b;
+	
+	unsigned int height;
+	unsigned int width;
+	unsigned int max_col_val;
+	
+	//total number of elements (pixels)
+	unsigned int size;
+	
+	ppm();
+	//create a PPM object and fill it with data stored in fname 
+	ppm(const std::string &fname);
+	//create an "epmty" PPM image with a given width and height;the R,G,B arrays are filled with zeros
+	ppm(const unsigned int _width, const unsigned int _height);
+	//read the PPM image from fname
+	void read(const std::string &fname);
+	//write the PPM image in fname
+	void write(const std::string &fname);
+};
 
+void ppm::init() {
+    width = 0;
+    height = 0;
+    max_col_val = 255;
+}
+
+//create a PPM object
+ppm::ppm() {
+    init();
+}
+
+ppm::ppm(const std::string &fname) {
+    init();
+    read(fname);
+}
+
+//create an "epmty" PPM image with a given width and height;the R,G,B arrays are filled with zeros
+ppm::ppm(const unsigned int _width, const unsigned int _height) {
+    init();
+    width = _width;
+    height = _height;
+    nr_lines = height;
+    nr_columns = width;
+    size = width*height;
+
+    // fill r, g and b with 0
+    r.resize(size);
+    g.resize(size);
+    b.resize(size);
+}
+
+
+void ppm::read(const std::string &fname) {
+    std::ifstream inp(fname.c_str(), std::ios::in | std::ios::binary);
+    if (inp.is_open()) {
+        std::string line;
+        std::getline(inp, line);
+        if (line != "P6") {
+            std::cout << "Error. Unrecognized file format." << std::endl;
+            return;
+        }
+        std::getline(inp, line);
+        while (line[0] == '#') {
+            std::getline(inp, line);
+        }
+        std::stringstream dimensions(line);
+        try {
+            dimensions >> width;
+            dimensions >> height;
+            nr_lines = height;
+            nr_columns = width;
+        } catch (std::exception &e) {
+            std::cout << "Header file format error. " << e.what() << std::endl;
+            return;
+        }
+        std::getline(inp, line);
+        std::stringstream max_val(line);
+        try {
+	    max_val >> max_col_val;
+        } catch (std::exception &e) {
+	    std::cout << "Header file format error. " << e.what() << std::endl;
+	    return;
+	}
+        size = width*height;
+        r.reserve(size);
+        g.reserve(size);
+        b.reserve(size);
+        char aux;
+        for (unsigned int i = 0; i < size; ++i) {
+            inp.read(&aux, 1);
+            r[i] = (unsigned char) aux;
+            inp.read(&aux, 1);
+            g[i] = (unsigned char) aux;
+            inp.read(&aux, 1);
+            b[i] = (unsigned char) aux;
+        }
+    } else {
+        std::cout << "Error. Unable to open " << fname << std::endl;
+    }
+    inp.close();
+}
+
+//unsigned char* PPMImage(const char* const fileName, unsigned int* const width, unsigned int* const height, unsigned int* const maximum)
+//{
+//	char* pSix;
+//	FILE* fr = fopen(fileName, "rb");
+//	fscanf(fr, "%s", pSix);
+//	//check to see if it's a PPM image file
+//	if (strncmp(pSix, "P6" , 10) != 0) {
+//		printf("Error: Bad File\n");
+//	} 
+//
+//	// read the rest of header
+//	fscanf(fr, "%d %d\n%d\n", width, height, maximum);
+//	//fscanf(fr, "%d\n", maximum);
+//	size = width*height;
+//
+//	unsigned char *data = new unsigned char[size*3];
+//      for (unsigned char *ptr = data; fscanf(fr, "%c", ptr) != EOF; ++ptr){
+//            printf("%c", *ptr);
+//	}
+//        fclose(fr);
+//	return data;
+//}
 
 
 
@@ -93,8 +230,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y){
 
 
 
-
-
 /// 
 /// Main function.  Initializes an SDL window, renderer, and texture,
 /// and then goes into a loop to listen to events and draw the texture.
@@ -110,6 +245,12 @@ int main(int argc, char** argv) {
   int num_cols = 480;
   int num_rows = 270;
 
+  const char* fileName = argv[1]; 
+  unsigned int width = 0;
+  unsigned int height = 0;
+  unsigned int maximum = 0;
+  unsigned char* pixmap = ppm(fileName);
+ 
   //Start up SDL and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init");
@@ -138,10 +279,11 @@ int main(int argc, char** argv) {
   //color that is a grayscale ramp from the leftmost to rightmost pixel.
   unsigned char* data = new unsigned char[num_cols*num_rows*3];
   //r is row, c is column, and ch is channel
-  for (int r=0; r<num_rows; r++) {
-    for (int c=0; c<num_cols; c++) {
+  for (int r=0; r<height; r++) {
+    for (int c=0; c<width; c++) {
       for (int ch=0; ch<3; ch++) {
-        data[3*(r*num_cols + c) + ch] = 255*float(c)/num_cols;
+        data[3*(r*num_cols + c) + ch] = *pixmap;
+	pixmap++;
       }
     }
   }
@@ -247,3 +389,4 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+

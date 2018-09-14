@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/basic_sdl.dir/main.cpp.o  -o basic_sdl -Wl,-Bstatic -lSDL2main -Wl,-Bdynamic -lSDL2 -lpthread 
