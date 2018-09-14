@@ -1,3 +1,0 @@
-/home/sev/433/asgmt01-svanhoesen/build/CMakeFiles/rebuild_cache.dir
-/home/sev/433/asgmt01-svanhoesen/build/CMakeFiles/basic_sdl.dir
-/home/sev/433/asgmt01-svanhoesen/build/CMakeFiles/edit_cache.dir
