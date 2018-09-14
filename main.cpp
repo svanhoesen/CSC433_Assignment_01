@@ -161,7 +161,7 @@ void ppm::read(const std::string &fname) {
             g[i] = (unsigned char) aux;
             inp.read(&aux, 1);
             b[i] = (unsigned char) aux;
-        }
+	}
     } else {
         std::cout << "Error. Unable to open " << fname << std::endl;
     }
@@ -242,15 +242,12 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y){
 int main(int argc, char** argv) {
   //Integers specifying the width (number of columns) and height (number
   //of rows) of the image
-  int num_cols = 480;
-  int num_rows = 270;
 
   const char* fileName = argv[1]; 
-  unsigned int width = 0;
-  unsigned int height = 0;
-  unsigned int maximum = 0;
-  unsigned char* pixmap = ppm(fileName);
+  ppm pixmap(fileName);
  
+  int num_cols = pixmap.width;
+  int num_rows = pixmap.height;
   //Start up SDL and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init");
@@ -279,12 +276,11 @@ int main(int argc, char** argv) {
   //color that is a grayscale ramp from the leftmost to rightmost pixel.
   unsigned char* data = new unsigned char[num_cols*num_rows*3];
   //r is row, c is column, and ch is channel
-  for (int r=0; r<height; r++) {
-    for (int c=0; c<width; c++) {
-      for (int ch=0; ch<3; ch++) {
-        data[3*(r*num_cols + c) + ch] = *pixmap;
-	pixmap++;
-      }
+  for (int r=0; r<num_rows; r++) {
+    for (int c=0; c<num_cols; c++) {
+        data[3*(r*num_cols + c) + 0] = pixmap.r[r*num_cols+c];
+        data[3*(r*num_cols + c) + 1] = pixmap.g[r*num_cols+c];
+        data[3*(r*num_cols + c) + 2] = pixmap.b[r*num_cols+c];
     }
   }
 
